@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products Browser</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+    h1 { margin-bottom: 8px; }
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    select, button {
+      padding: 10px 14px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: white;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+    .meta { color: #64748b; font-size: 13px; margin-top: 4px; }
+    .status { margin: 12px 0; color: #475569; }
+  </style>
+</head>
+<body>
+  <h1>Products</h1>
+  <p>Browse 200,000 products — newest first, stable cursor pagination.</p>
+
+  <div class="controls">
+    <select id="category">
+      <option value="">All categories</option>
+    </select>
+    <button id="reset">Reset</button>
+    <button id="more">Load more</button>
+  </div>
+
+  <div class="status" id="status">Loading...</div>
+  <div id="list"></div>
+
+  <script>
+    let cursor = null;
+    let totalLoaded = 0;
+
+    async function loadCategories() {
+      const res = await fetch('/categories');
+      const data = await res.json();
+      const select = document.getElementById('category');
+      data.items.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.category;
+        opt.textContent = `${item.category} (${item.count.toLocaleString()})`;
+        select.appendChild(opt);
+      });
+    }
+
+    async function loadProducts(reset = false) {
+      const status = document.getElementById('status');
+      const list = document.getElementById('list');
+      const moreBtn = document.getElementById('more');
+
+      if (reset) {
+        cursor = null;
+        totalLoaded = 0;
+        list.innerHTML = '';
+      }
+
+      status.textContent = 'Loading...';
+      moreBtn.disabled = true;
+
+      const category = document.getElementById('category').value;
+      const url = new URL('/products', window.location.origin);
+      url.searchParams.set('limit', '20');
+      if (category) url.searchParams.set('category', category);
+      if (cursor) url.searchParams.set('cursor', cursor);
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      data.items.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <strong>${product.name}</strong>
+          <div class="meta">
+            ${product.category} · $${product.price.toFixed(2)} ·
+            created ${new Date(product.created_at).toLocaleString()}
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      totalLoaded += data.items.length;
+      cursor = data.next_cursor;
+      status.textContent = `Loaded ${totalLoaded.toLocaleString()} products`;
+      moreBtn.disabled = !data.has_more;
+    }
+
+    document.getElementById('more').addEventListener('click', () => loadProducts(false));
+    document.getElementById('reset').addEventListener('click', () => loadProducts(true));
+    document.getElementById('category').addEventListener('change', () => loadProducts(true));
+
+    loadCategories().then(() => loadProducts(true));
+  </script>
+</body>
+</html>

@@ -6,7 +6,7 @@
 
 ## GitHub
 
-`https://github.com/YOUR-USER/codevector-products`
+`https://github.com/rudraprakashnayak/codevector-products`
 
 ## What I chose and why
 

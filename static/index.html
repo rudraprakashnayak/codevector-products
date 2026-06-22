@@ -4,69 +4,353 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Products Browser</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
   <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: system-ui, sans-serif;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 24px;
-      background: #f8fafc;
-      color: #0f172a;
+    :root {
+      --bg: #0b1020;
+      --surface: #141b2d;
+      --surface-hover: #1a2438;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --accent-glow: rgba(99, 102, 241, 0.35);
+      --success: #34d399;
+      --radius: 14px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
     }
-    h1 { margin-bottom: 8px; }
-    .controls {
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "DM Sans", system-ui, sans-serif;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.25), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(168, 85, 247, 0.12), transparent),
+        var(--bg);
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 20px 64px;
+    }
+
+    header {
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-hover);
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #fff 0%, #c7d2fe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 520px;
+    }
+
+    .toolbar {
       display: flex;
       gap: 12px;
-      margin: 20px 0;
       flex-wrap: wrap;
+      align-items: center;
+      padding: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
     }
-    select, button {
-      padding: 10px 14px;
+
+    .toolbar label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-right: -4px;
+    }
+
+    select {
+      flex: 1;
+      min-width: 180px;
+      padding: 11px 14px;
+      font-family: inherit;
       font-size: 14px;
-      border-radius: 8px;
-      border: 1px solid #cbd5e1;
-      background: white;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    button {
-      background: #2563eb;
-      color: white;
+
+    select:hover, select:focus {
+      outline: none;
+      border-color: rgba(99, 102, 241, 0.5);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .btn {
+      padding: 11px 18px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 10px;
       border: none;
       cursor: pointer;
+      transition: transform 0.15s, background 0.2s, box-shadow 0.2s;
     }
-    button:disabled {
-      background: #94a3b8;
+
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      color: white;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--accent-hover), #a78bfa);
+      box-shadow: 0 6px 20px var(--accent-glow);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.2);
+      background: var(--surface-hover);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
       cursor: not-allowed;
+      transform: none;
     }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 10px var(--success);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .status-bar.loading .status-dot {
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+      animation: spin 0.8s linear infinite;
+      border-radius: 2px;
+      width: 10px;
+      height: 10px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
     .card {
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      animation: fadeIn 0.35s ease backwards;
     }
-    .meta { color: #64748b; font-size: 13px; margin-top: 4px; }
-    .status { margin: 12px 0; color: #475569; }
+
+    .card:hover {
+      background: var(--surface-hover);
+      border-color: rgba(99, 102, 241, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-left { min-width: 0; }
+
+    .card-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: capitalize;
+      border-radius: 999px;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-electronics { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+    .badge-clothing    { background: rgba(236, 72, 153, 0.2); color: #f9a8d4; }
+    .badge-home        { background: rgba(251, 146, 60, 0.2); color: #fdba74; }
+    .badge-books       { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+    .badge-sports      { background: rgba(234, 179, 8, 0.2); color: #fde047; }
+    .badge-toys        { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
+    .badge-garden      { background: rgba(20, 184, 166, 0.2); color: #5eead4; }
+
+    .price {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--success);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(148, 163, 184, 0.6);
+    }
+
+    footer a {
+      color: var(--accent-hover);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .price { font-size: 1rem; }
+    }
   </style>
 </head>
 <body>
-  <h1>Products</h1>
-  <p>Browse 200,000 products — newest first, stable cursor pagination.</p>
+  <div class="page">
+    <header>
+      <span class="eyebrow">CodeVector · Take Home</span>
+      <h1>Product Catalog</h1>
+      <p class="subtitle">Browse 200,000 products — newest first, with stable cursor pagination.</p>
+    </header>
 
-  <div class="controls">
-    <select id="category">
-      <option value="">All categories</option>
-    </select>
-    <button id="reset">Reset</button>
-    <button id="more">Load more</button>
+    <div class="toolbar">
+      <label for="category">Category</label>
+      <select id="category">
+        <option value="">All categories</option>
+      </select>
+      <button class="btn btn-secondary" id="reset">Reset</button>
+      <button class="btn btn-primary" id="more">Load more</button>
+    </div>
+
+    <div class="status-bar loading" id="statusBar">
+      <span class="status-dot"></span>
+      <span id="status">Loading products...</span>
+    </div>
+
+    <div id="list"></div>
+
+    <footer>
+      API docs at <a href="/docs">/docs</a> · Keyset pagination on <code>(created_at, id)</code>
+    </footer>
   </div>
-
-  <div class="status" id="status">Loading...</div>
-  <div id="list"></div>
 
   <script>
     let cursor = null;
     let totalLoaded = 0;
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function setLoading(isLoading, message) {
+      const bar = document.getElementById('statusBar');
+      const status = document.getElementById('status');
+      bar.classList.toggle('loading', isLoading);
+      status.textContent = message;
+    }
 
     async function loadCategories() {
       const res = await fetch('/categories');
@@ -81,7 +365,6 @@
     }
 
     async function loadProducts(reset = false) {
-      const status = document.getElementById('status');
       const list = document.getElementById('list');
       const moreBtn = document.getElementById('more');
 
@@ -91,7 +374,7 @@
         list.innerHTML = '';
       }
 
-      status.textContent = 'Loading...';
+      setLoading(true, 'Loading products...');
       moreBtn.disabled = true;
 
       const category = document.getElementById('category').value;
@@ -103,22 +386,31 @@
       const res = await fetch(url);
       const data = await res.json();
 
-      data.items.forEach(product => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <strong>${product.name}</strong>
-          <div class="meta">
-            ${product.category} · $${product.price.toFixed(2)} ·
-            created ${new Date(product.created_at).toLocaleString()}
-          </div>
-        `;
-        list.appendChild(card);
-      });
+      if (reset && data.items.length === 0) {
+        list.innerHTML = '<div class="empty">No products found in this category.</div>';
+      } else {
+        data.items.forEach((product, i) => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.style.animationDelay = `${i * 0.04}s`;
+          const catClass = `badge-${product.category}`;
+          card.innerHTML = `
+            <div class="card-left">
+              <div class="card-name">${escapeHtml(product.name)}</div>
+              <div class="card-meta">
+                <span class="badge ${catClass}">${escapeHtml(product.category)}</span>
+                <span>${new Date(product.created_at).toLocaleString()}</span>
+              </div>
+            </div>
+            <div class="price">$${product.price.toFixed(2)}</div>
+          `;
+          list.appendChild(card);
+        });
+      }
 
       totalLoaded += data.items.length;
       cursor = data.next_cursor;
-      status.textContent = `Loaded ${totalLoaded.toLocaleString()} products`;
+      setLoading(false, `Showing ${totalLoaded.toLocaleString()} product${totalLoaded === 1 ? '' : 's'}`);
       moreBtn.disabled = !data.has_more;
     }
 
